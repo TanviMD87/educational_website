@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - SciAstra</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f1f5f8;
+            padding-top: 50px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #007bff;
+        }
+
+        .card {
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .payment-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .payment-option input {
+            margin-right: 10px;
+        }
+
+        .form-control {
+            border-radius: 5px;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            border-radius: 5px;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .verification-step {
+            margin-top: 30px;
+        }
+
+        .verification-step h5 {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .step-input {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Course Payment</h1>
+        <div class="card">
+            <div class="card-header">
+                Payment Details for: {{ course['name'] }}
+            </div>
+            <div class="card-body">
+                <p class="text-center"><strong>Amount: ${{ course['price'] }}</strong></p>
+
+                <form method="POST" action="{{ url_for('verify_payment') }}">
+
+                    <!-- Payment Option Selection -->
+                    <h5>Select Payment Method</h5>
+                    <div class="payment-option">
+                        <input type="radio" id="credit-card" name="payment_method" value="Credit Card" checked>
+                        <label for="credit-card">Credit/Debit Card</label>
+                    </div>
+                    <div class="payment-option">
+                        <input type="radio" id="upi" name="payment_method" value="UPI">
+                        <label for="upi">UPI</label>
+                    </div>
+
+                    <!-- Credit/Debit Card Payment Form -->
+                    <div id="card-details">
+                        <div class="step-input">
+                            <label for="card_number">Card Number</label>
+                            <input type="text" class="form-control" id="card_number" name="card_number" placeholder="Enter card number" required>
+                        </div>
+                        <div class="step-input">
+                            <label for="cvv">CVV</label>
+                            <input type="text" class="form-control" id="cvv" name="cvv" placeholder="Enter CVV" required>
+                        </div>
+                    </div>
+
+                    <!-- UPI Payment Form -->
+                    <div id="upi-details" style="display: none;">
+                        <div class="step-input">
+                            <label for="upi_id">UPI ID</label>
+                            <input type="text" class="form-control" id="upi_id" name="upi_id" placeholder="Enter your UPI ID" required>
+                        </div>
+                    </div>
+
+                    <!-- Submit Payment -->
+                    <button type="submit" class="btn-primary">Proceed to Payment</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Two-Step Verification -->
+        <div class="verification-step">
+            <h5>Step 1: Enter OTP</h5>
+            <form method="POST" action="{{ url_for('verify_payment') }}">
+                <div class="step-input">
+                    <label for="otp">Enter OTP Sent to Your Registered Email</label>
+                    <input type="text" class="form-control" id="otp" name="otp" placeholder="Enter OTP" required>
+                </div>
+                <button type="submit" class="btn-primary">Verify OTP</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Toggle between card details and UPI details based on selected payment method
+        document.querySelectorAll('input[name="payment_method"]').forEach((elem) => {
+            elem.addEventListener('change', function () {
+                if (document.getElementById('credit-card').checked) {
+                    document.getElementById('card-details').style.display = 'block';
+                    document.getElementById('upi-details').style.display = 'none';
+                } else if (document.getElementById('upi').checked) {
+                    document.getElementById('card-details').style.display = 'none';
+                    document.getElementById('upi-details').style.display = 'block';
+                }
+            });
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
